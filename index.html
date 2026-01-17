@@ -179,14 +179,14 @@ function afficher(items) {
       <strong>${index + 1}. ${item.texte}</strong><br><br>
 
       <button onclick="toggleImage('${posImgId}', this)">
-        Afficher l’indice position
+        Afficher l'indice position
       </button>
       ${item.positionImage ? `<img id="${posImgId}" src="${item.positionImage}">` : ""}
 
       <br><br>
 
       <button onclick="toggleImage('${actImgId}', this)">
-        Afficher l’indice technique
+        Afficher l'indice technique
       </button>
       ${item.actionImage ? `<img id="${actImgId}" src="${item.actionImage}">` : ""}
     `;
@@ -264,4 +264,3 @@ function genererSequence() {
 
 </body>
 </html>
-
