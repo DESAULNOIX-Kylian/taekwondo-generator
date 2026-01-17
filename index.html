@@ -4,29 +4,72 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Générateur Taekwondo</title>
+
 <style>
-body { font-family: Arial, sans-serif; background: #f4f4f4; text-align: center; padding: 20px; }
-h1 { color: #333; }
-input, button { font-size: 1.1rem; padding: 10px 15px; margin: 6px; }
-button { background: #2c7be5; color: white; border: none; border-radius: 10px; cursor: pointer; }
-button:hover { background: #1a5dc9; }
-#result { margin-top: 20px; text-align: left; display: inline-block; width: 100%; max-width: 500px; }
-.card { background: white; padding: 15px; border-radius: 12px; margin-bottom: 15px; box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
-img { max-width: 100%; border-radius: 10px; margin-top: 10px; display: none; }
+  body {
+    font-family: Arial, sans-serif;
+    background: #f4f4f4;
+    text-align: center;
+    padding: 20px;
+  }
+  h1 { color: #333; }
+
+  input, button {
+    font-size: 1.1rem;
+    padding: 10px 15px;
+    margin: 6px;
+  }
+
+  button {
+    background: #2c7be5;
+    color: white;
+    border: none;
+    border-radius: 10px;
+    cursor: pointer;
+  }
+
+  button:hover { background: #1a5dc9; }
+
+  #result {
+    margin-top: 20px;
+    text-align: left;
+    display: inline-block;
+    width: 100%;
+    max-width: 500px;
+  }
+
+  .card {
+    background: white;
+    padding: 15px;
+    border-radius: 12px;
+    margin-bottom: 15px;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+  }
+
+  img {
+    max-width: 100%;
+    border-radius: 10px;
+    margin-top: 10px;
+    display: none;
+  }
 </style>
 </head>
+
 <body>
 
 <h1>🥋 Générateur Taekwondo</h1>
+
 <label>Poomsae maximum :</label>
 <input type="number" id="poomsaeMax" min="1" max="8" value="8">
+
 <br>
 <button onclick="genererCombinaison()">🎲 Combinaison aléatoire</button>
 <button onclick="genererSequence()">📚 Séquence (2-3 techniques)</button>
+
 <div id="result"></div>
 
 <script>
-/* ===================== DONNÉES COMPLÈTES ===================== */
+/* ===================== DONNÉES ===================== */
 const data = {
 "positions":[
 {"id":"ap_seugui","nom":"Ap Seugui","poomsae":[1,2,3,4,7],"image":"images/position/ap_seugui.png"},
@@ -87,70 +130,97 @@ const data = {
 ]
 };
 
+
 /* ===================== OUTILS ===================== */
-function filtrerParPoomsae(liste,max){return liste.filter(t=>t.poomsae.some(p=>p<=max));}
-function randomItem(arr){return arr[Math.floor(Math.random()*arr.length)];}
+
+function filtrerParPoomsae(liste, max) {
+  return liste.filter(t => t.poomsae.some(p => p <= max));
+}
+
+function randomItem(arr) {
+  return arr[Math.floor(Math.random() * arr.length)];
+}
 
 /* ===================== AFFICHAGE ===================== */
-function afficher(items){
-  const result=document.getElementById("result");
-  result.innerHTML="";
-  items.forEach((item,index)=>{
-    const card=document.createElement("div");
-    card.className="card";
-    const posImgId=`pos_img_${index}`;
-    const actImgId=`act_img_${index}`;
-    card.innerHTML=`
+
+function afficher(items) {
+  const result = document.getElementById("result");
+  result.innerHTML = "";
+
+  items.forEach((item, index) => {
+    const posImgId = `pos_img_${index}`;
+    const actImgId = `act_img_${index}`;
+
+    const card = document.createElement("div");
+    card.className = "card";
+
+    card.innerHTML = `
       <strong>${index+1}. ${item.texte}</strong><br><br>
-      <button onclick="toggleImage('${posImgId}', this)">Afficher l'indice position</button>
-      ${item.positionImage?`<img id="${posImgId}" src="${item.positionImage}">`:''}
-      <br><br>
-      <button onclick="toggleImage('${actImgId}', this)">Afficher l'indice technique</button>
-      ${item.actionImage?`<img id="${actImgId}" src="${item.actionImage}">`:''}
+
+      <button onclick="toggleImage('${posImgId}', this)">Afficher l'indice position</button><br>
+      <img id="${posImgId}" src="${item.positionImage}" style="display:none;"><br>
+
+      <button onclick="toggleImage('${actImgId}', this)">Afficher l'indice technique</button><br>
+      <img id="${actImgId}" src="${item.actionImage}" style="display:none;">
     `;
+
     result.appendChild(card);
   });
 }
 
-function toggleImage(id,btn){
-  const img=document.getElementById(id);
-  if(!img) return;
-  const hidden=getComputedStyle(img).display==="none";
-  img.style.display=hidden?"block":"none";
-  btn.innerText=hidden?"Cacher l’indice":"Afficher l’indice";
+function toggleImage(id, btn) {
+  const img = document.getElementById(id);
+  if (!img) return;
+
+  const isHidden = getComputedStyle(img).display === "none";
+  img.style.display = isHidden ? "block" : "none";
+  btn.innerText = isHidden ? "Cacher l’indice" : "Afficher l’indice";
 }
 
 /* ===================== GÉNÉRATEURS ===================== */
-function genererCombinaison(){
-  const max=+document.getElementById("poomsaeMax").value;
-  const position=randomItem(filtrerParPoomsae(data.positions,max));
-  const actions=[
-    ...filtrerParPoomsae(data.blocages,max),
-    ...filtrerParPoomsae(data.coups_main,max),
-    ...filtrerParPoomsae(data.coups_pied,max),
-    ...filtrerParPoomsae(data.speciaux,max)
+
+function genererCombinaison() {
+  const max = +document.getElementById("poomsaeMax").value;
+  const position = randomItem(filtrerParPoomsae(data.positions, max));
+
+  const actions = [
+    ...filtrerParPoomsae(data.blocages, max),
+    ...filtrerParPoomsae(data.coups_main, max),
+    ...filtrerParPoomsae(data.coups_pied, max)
   ];
-  const action=randomItem(actions);
-  afficher([{texte:`${position.nom} + ${action.nom}`,positionImage:position.image,actionImage:action.image}]);
+  const action = randomItem(actions);
+
+  afficher([{
+    texte: `${position.nom} + ${action.nom}`,
+    positionImage: position.image,
+    actionImage: action.image
+  }]);
 }
 
-function genererSequence(){
-  const max=+document.getElementById("poomsaeMax").value;
-  const longueur=Math.random()<0.5?2:3;
-  const positions=filtrerParPoomsae(data.positions,max);
-  const blocs=filtrerParPoomsae(data.blocages,max);
-  const mains=filtrerParPoomsae(data.coups_main,max);
-  const pieds=filtrerParPoomsae(data.coups_pied,max);
+function genererSequence() {
+  const max = +document.getElementById("poomsaeMax").value;
+  const longueur = Math.random() < 0.5 ? 2 : 3;
 
-  const schema=longueur===2?[blocs,mains]:[blocs,mains,pieds];
+  const positions = filtrerParPoomsae(data.positions, max);
+  const blocs = filtrerParPoomsae(data.blocages, max);
+  const mains = filtrerParPoomsae(data.coups_main, max);
+  const pieds = filtrerParPoomsae(data.coups_pied, max);
 
-  const sequence=schema.map(actions=>{
-    const action=randomItem(actions);
-    const position=randomItem(positions);
-    return {texte:`${position.nom} + ${action.nom}`,positionImage:position.image,actionImage:action.image};
+  const schema = longueur === 2 ? [blocs, mains] : [blocs, mains, pieds];
+
+  const sequence = schema.map(actions => {
+    const action = randomItem(actions);
+    const position = randomItem(positions);
+    return {
+      texte: `${position.nom} + ${action.nom}`,
+      positionImage: position.image,
+      actionImage: action.image
+    };
   });
+
   afficher(sequence);
 }
 </script>
+
 </body>
 </html>
